@@ -6,7 +6,7 @@ A single-page Power BI report that gives retail teams an at-a-glance view of sal
 
 ## 📸 Dashboard Preview
 
-![Sales Dashboard](C:\Users\HP\OneDrive\Desktop\screenshot of my dashboard.png)
+![Sales Dashboard](https://github.com/ShubamNathTiwari/retails-dashboard/blob/main/screenshot%20of%20)
 
 ---
 
