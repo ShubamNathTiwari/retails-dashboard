@@ -6,7 +6,7 @@ A single-page Power BI report that gives retail teams an at-a-glance view of sal
 
 ## 📸 Dashboard Preview
 
-![Sales Dashboard](screenshot of my dashboard.png)
+![Sales Dashboard](screenshot_of_my_dashboard.png)
 
 ---
 
@@ -14,9 +14,10 @@ A single-page Power BI report that gives retail teams an at-a-glance view of sal
 
 ```
 retail-powerbi/
-├── Retail_dashboard.pbix        # Main Power BI report file
-├── physical_data_model.docx     # Data model diagram (SmartArt)
-├── screenshot_of_my_dashboard.png
+├── Retail_dashboard.pbix           # Main Power BI report file
+├── physical_data_model.docx        # Data model diagram (SmartArt)
+├── screenshot_of_my_dashboard.png  # Dashboard preview
+├── screenshot_of_model_view.png    # Power BI model view
 └── README.md
 ```
 
@@ -50,6 +51,8 @@ retail-powerbi/
 
 The report uses a **star schema** with one fact table and four dimension tables.
 
+![Model View](screenshot_of_model_view.png)
+
 ```
 Dim_Calendar ──┐
 Dim_Product  ──┤
@@ -61,32 +64,62 @@ Dim_Store    ──┘
 ### Tables
 
 #### `Fact_Sales`
-Central transaction table. Expected columns include:
+Central transaction table — one row per order line.
 
-- `SaleID` — Unique transaction identifier
-- `DateKey` — Foreign key → `Dim_Calendar`
-- `ProductKey` — Foreign key → `Dim_Product`
-- `CustomerKey` — Foreign key → `Dim_Customer`
-- `StoreKey` — Foreign key → `Dim_Store`
-- `SalesAmount` — Revenue for the transaction
-- `Profit` — Profit for the transaction
-- `Quantity` — Units sold
+| Column | Type | Description |
+|---|---|---|
+| `OrderID` | Text | Unique order identifier |
+| `OrderDate` | Date | Foreign key → `Dim_Calendar` |
+| `ProductID` | Text | Foreign key → `Dim_Product` |
+| `CustomerID` | Text | Foreign key → `Dim_Customer` |
+| `StoreID` | Text | Foreign key → `Dim_Store` |
+| `CostPrice` | Decimal (Σ) | Cost of goods |
+| `DiscountPct` | Decimal (Σ) | Discount percentage applied |
+| `Profit` | Decimal | Profit per line |
+| `Quantity` | Integer (Σ) | Units sold |
+| `PaymentMode` | Text | Payment method used |
 
 #### `Dim_Calendar`
-- `DateKey`, `Date`, `Year`, `Month`, `MonthName`, `Quarter`
-- Supports the Year and Month slicer filters
+| Column | Description |
+|---|---|
+| `Date` | Full date (marked as Date Table) |
+| `Month` | Month number |
+| `Quarter` | Quarter number |
+| `Year` | Calendar year |
+| `Total Sales (SUMX)` | Calculated measure |
 
 #### `Dim_Product`
-- `ProductKey`, `ProductName`, `Category`, `Brand`
-- Powers the Category and Brand slicer filters
+| Column | Description |
+|---|---|
+| `ProductID` | Primary key |
+| `ProductName` | Product display name |
+| `Category` | Product category (Beauty, Clothing, Electronics, Grocery, Home) |
+| `Brand` | Brand name (BrandA – BrandE) |
 
 #### `Dim_Customer`
-- `CustomerKey`, `CustomerID`, `CustomerName`, `Region`
-- Powers the Region filter and Top 10 Customer visual
+| Column | Description |
+|---|---|
+| `CustomerID` | Primary key |
+| `CustomerName` | Customer display name |
+| `City` | Customer city |
+| `Region` | Sales region (East, West, North, South) |
 
 #### `Dim_Store`
-- `StoreKey`, `StoreID`, `StoreName`, `Location`
-- Powers the StoreID slicer filter
+| Column | Description |
+|---|---|
+| `Store Key` | Primary key |
+| `StoreID` | Store identifier (S1 – S5) |
+| `SalespersonID` | Assigned salesperson |
+| `Channel` | Sales channel |
+
+### Relationships
+
+| From | To | Cardinality |
+|---|---|---|
+| `Fact_Sales[ProductID]` | `Dim_Product[ProductID]` | Many-to-One (`*` → `1`) |
+| `Fact_Sales[CustomerID]` | `Dim_Customer[CustomerID]` | Many-to-One (`*` → `1`) |
+| `Fact_Sales[OrderDate]` | `Dim_Calendar[Date]` | Many-to-One (`*` → `1`) |
+| `Fact_Sales[StoreID]` | `Dim_Store[StoreID]` | Many-to-One (`*` → `1`) |
 
 ---
 
